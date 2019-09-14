@@ -15,15 +15,20 @@ def get_news_id(url):
     news_id = soup.find('span', {'class': 'news_view_count'})['news_id']
     return news_id
 
+def get_comments(url):
+    r = requests.get(url)
+    comments_decoded = json.loads(r.text)
+    best_comment = comments_decoded['pins']['best']
+    comments = comments_decoded['comments']
+
+    return best_comment, comments
+
 url = sys.argv[1]
 
 topic = get_topic(url)
 news_id = get_news_id(url)
-print(news_id)
-comments_url = "https://comments.api.onliner.by/news/" + topic + ".post/" + str(news_id) + "/comments"
+best_url = "https://comments.api.onliner.by/news/" + topic + ".post/" + str(news_id) + "/comments?limit=99999"
 
-r = requests.get(comments_url)
-comments_decoded = json.loads(r.text)
+best_comment, comments = get_comments(best_url)
 
-best = comments_decoded['pins']['best']
-print(best)
+print(comments[2])
